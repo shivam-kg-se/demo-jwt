@@ -3,6 +3,10 @@ package com.jwt.services;
 import com.jwt.models.User;
 import com.jwt.repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -10,51 +14,33 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-public class UserServiceImpl implements IUserService{
+public class UserServiceImpl implements IUserService, UserDetailsService {
 
     @Autowired
     private UserRepo userRepo;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public User register(User user) {
         String Id = UUID.randomUUID().toString();
         user.setUserId(Id);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return this.userRepo.save(user);
     }
 
-
-//    @Override
-//    public User saveUser(User user) {
-//
-//            String userId = UUID.randomUUID().toString();
-//            user.setUserId(userId);
-//        return this.userRepo.save(user);
-//    }
-
-//    @Override
-//    public List<User> getAllUsers() {
-//        return this.userRepo.findAll();
-//    }
-
-
-//    @Override
-//    public List<User> getUsers() {
-//        return List.of();
-//    }
-
-
-//    private List<User> store = new ArrayList<>();
-//    public UserServiceImpl() {
-//        store.add(new User(UUID.randomUUID().toString(),"shivam ","shivam123"));
-//        store.add(new User(UUID.randomUUID().toString(),"ayush","ayush123"));
-//        store.add(new User(UUID.randomUUID().toString(),"shivang","shivang123"));
-//
-//        store.add(new User(UUID.randomUUID().toString(),"satyam","satyam123"));
-//
-//    }
-
-//    @Override
-//    public List<User> getUsers() {
-//        return this.store;
-//    }
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        System.out.println("Loading user by username: " + username);
+        User user = userRepo.findByName(username).orElseThrow(() -> new UsernameNotFoundException("User not found with name: " + username));
+        System.out.println("User found: " + user.getName());
+        System.out.println("Encoded password: " + user.getPassword());
+        return org.springframework.security.core.userdetails
+                .User
+                .withUsername(user.getName())
+                .password(user.getPassword())
+                .authorities(new ArrayList<>())
+                .build();
+    }
 }

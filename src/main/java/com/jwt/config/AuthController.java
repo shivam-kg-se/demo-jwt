@@ -40,10 +40,10 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> login(@RequestBody JwtRequest request) {
 
-        this.doAuthenticate(request.getEmail(), request.getPassword());
+        this.doAuthenticate(request.getName(), request.getPassword());
 
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
+        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getName());
         String token = this.helper.generateToken(userDetails);
 
         JwtResponse response = JwtResponse.builder()
@@ -57,9 +57,11 @@ public class AuthController {
     }
 
 
-    private void doAuthenticate(String email, String password) {
+    private void doAuthenticate(String name, String password) {
 
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(email, password);
+        System.out.println("Authenticating user: " + name);
+        System.out.println("Password provided: " + password);
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(name, password);
         try {
             manager.authenticate(authentication);
 

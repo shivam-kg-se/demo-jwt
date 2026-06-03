@@ -18,13 +18,14 @@ public class HomeController {
     private IUserService userService;
 
 
-//    @GetMapping("/user")
-//    public List<User> getAllUser(){
-//
-//        return this.userService.getAllUsers();
-//    }
-//    public String getLoggedInUser(Principal principal){
-//        return  principal.getName();
-//    }
+    @GetMapping("/user")
+    public String getAllUser(){
+        System.out.println("Fetching all users");
+
+        return "Welcome to the home page! and  it access using your jwt ";
+    }
+    public String getLoggedInUser(Principal principal){
+        return  principal.getName();
+    }
 
 }

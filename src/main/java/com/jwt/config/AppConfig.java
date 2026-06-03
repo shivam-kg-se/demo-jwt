@@ -15,13 +15,6 @@ import org.springframework.web.client.RestClient;
 
 @Configuration
 public class AppConfig {
-
-    @Bean
-    public UserDetailsService userDetailsService() {
-        UserDetails user1 = User.builder().username("shivam").password(passwordEncoder().encode("shivam123")).roles("ADMIN").build();
-        UserDetails user2 = User.builder().username("ayush").password(passwordEncoder().encode("ayush123")).roles("USER").build();
-        return new InMemoryUserDetailsManager(user1, user2);
-    }
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
