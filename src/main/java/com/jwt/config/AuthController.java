@@ -3,7 +3,10 @@ package com.jwt.config;
 
 import com.jwt.models.JwtRequest;
 import com.jwt.models.JwtResponse;
+import com.jwt.models.User;
+import com.jwt.repository.UserRepo;
 import com.jwt.security.JwtHelper;
+import com.jwt.services.UserServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +29,8 @@ public class AuthController {
     @Autowired
     private AuthenticationManager manager;
 
-
+    @Autowired
+    private UserServiceImpl userService;
     @Autowired
     private JwtHelper helper;
 
@@ -47,6 +51,11 @@ public class AuthController {
                 .username(userDetails.getUsername()).build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+    @PostMapping("/register")
+    public ResponseEntity<User> registerUser(@RequestBody User user){
+        return ResponseEntity.ok(this.userService.register(user));
+    }
+
 
     private void doAuthenticate(String email, String password) {
 
