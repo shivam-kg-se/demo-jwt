@@ -25,13 +25,13 @@ public class SecurityConfig {
                .cors(cors->cors.disable())
                        .authorizeHttpRequests(
                                auth->auth
-                                       .requestMatchers("/auth/login","/auth/register").permitAll()
+                                       .requestMatchers("/auth/login","/auth/register","/v3/api-docs/**",
+                                               "/swagger-ui/**",
+                                               "/swagger-ui.html").permitAll()
                                        .requestMatchers("/home/**").authenticated().anyRequest().authenticated()
                                        )
                .exceptionHandling(ex->ex.authenticationEntryPoint(point))
                .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-
-
         http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

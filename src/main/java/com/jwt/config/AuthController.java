@@ -1,10 +1,9 @@
 package com.jwt.config;
 
 
-import com.jwt.models.JwtRequest;
-import com.jwt.models.JwtResponse;
-import com.jwt.models.User;
-import com.jwt.repository.UserRepo;
+import com.jwt.bindings.UserRequest;
+import com.jwt.bindings.UserResponse;
+import com.jwt.entity.User;
 import com.jwt.security.JwtHelper;
 import com.jwt.services.UserServiceImpl;
 import org.slf4j.Logger;
@@ -27,7 +26,7 @@ public class AuthController {
     private UserDetailsService userDetailsService;
 
     @Autowired
-    private AuthenticationManager manager;
+    private AuthenticationManager  manager;
 
     @Autowired
     private UserServiceImpl userService;
@@ -38,36 +37,33 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<JwtResponse> login(@RequestBody JwtRequest request) {
+    public ResponseEntity<UserResponse> login(@RequestBody UserRequest request) {
 
-        this.doAuthenticate(request.getName(), request.getPassword());
-
-
-        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getName());
+        this.doAuthenticate(request.getEmail() ,request.getPassword());
+        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
         String token = this.helper.generateToken(userDetails);
 
-        JwtResponse response = JwtResponse.builder()
-                .jwtToken(token)
-                .username(userDetails.getUsername()).build();
+        UserResponse response = new UserResponse();
+        response.setEmail(userDetails.getUsername());
+        response.setJwtToken(token);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
     @PostMapping("/register")
     public ResponseEntity<User> registerUser(@RequestBody User user){
         return ResponseEntity.ok(this.userService.register(user));
     }
 
+    private void doAuthenticate(String email, String password) {
 
-    private void doAuthenticate(String name, String password) {
-
-        System.out.println("Authenticating user: " + name);
+        System.out.println("Authenticating user: " + email);
         System.out.println("Password provided: " + password);
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(name, password);
+
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(email, password);
         try {
             manager.authenticate(authentication);
-
-
         } catch (BadCredentialsException e) {
-            throw new BadCredentialsException(" Invalid Username or Password  !!");
+            throw new BadCredentialsException(" Invalid email or Password  !!");
         }
 
     }
