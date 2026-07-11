@@ -10,7 +10,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements IUserService, UserDetailsService {
@@ -22,8 +21,6 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 
     @Override
     public User register(User user) {
-        user.setName(user.getName());
-        user.setEmail(user.getEmail());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return this.userRepo.save(user);
     }
@@ -36,7 +33,7 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
         System.out.println("Encoded password: " + user.getPassword());
         return org.springframework.security.core.userdetails
                 .User
-                .withUsername(user.getName())
+                .withUsername(user.getEmail())
                 .password(user.getPassword())
                 .authorities(new ArrayList<>())
                 .build();

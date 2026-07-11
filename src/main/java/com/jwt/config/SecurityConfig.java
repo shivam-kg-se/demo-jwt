@@ -2,7 +2,7 @@ package com.jwt.config;
 
 import com.jwt.security.JwtAuthenticationEntryPoint;
 import com.jwt.security.JwtAuthenticationFilter;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -11,28 +11,35 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-    @Autowired
-    private JwtAuthenticationEntryPoint point;
-
-    @Autowired
-    private JwtAuthenticationFilter filter;
+    private final JwtAuthenticationEntryPoint authenticationEntryPoint;
+    private final JwtAuthenticationFilter authenticationFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-       http.csrf(csrf->csrf.disable())
-               .cors(cors->cors.disable())
-                       .authorizeHttpRequests(
-                               auth->auth
-                                       .requestMatchers("/auth/login","/auth/register","/v3/api-docs/**",
-                                               "/swagger-ui/**",
-                                               "/swagger-ui.html").permitAll()
-                                       .requestMatchers("/home/**").authenticated().anyRequest().authenticated()
-                                       )
-               .exceptionHandling(ex->ex.authenticationEntryPoint(point))
-               .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
+
+        http
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(ex ->
+                        ex.authenticationEntryPoint(authenticationEntryPoint))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/auth/login",
+                                "/auth/register",
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
+                        .anyRequest().authenticated()
+                );
+
+        http.addFilterBefore(authenticationFilter,
+                UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 }

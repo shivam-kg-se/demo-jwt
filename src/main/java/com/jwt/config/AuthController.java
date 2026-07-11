@@ -51,6 +51,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<User> registerUser(@RequestBody User user){
+        logger.error("Registering User");
         return ResponseEntity.ok(this.userService.register(user));
     }
 

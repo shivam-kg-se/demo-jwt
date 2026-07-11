@@ -18,7 +18,6 @@ public class HomeController {
     @GetMapping("/user")
     public String getAllUser(){
         System.out.println("Fetching all users");
-
         return "Welcome to the home page! and  it access using your jwt ";
     }
     public String getLoggedInUser(Principal principal){
