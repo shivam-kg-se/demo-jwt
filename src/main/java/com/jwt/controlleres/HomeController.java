@@ -13,15 +13,13 @@ public class HomeController {
 
     @Autowired
     private IUserService userService;
-
-
     @GetMapping("/user")
     public String getAllUser(){
         System.out.println("Fetching all users");
-        return "Welcome to the home page! and  it access using your jwt ";
+        return "Welcome to the home page! and  you are accessing it by using your credentials";
     }
+    @GetMapping("/me")
     public String getLoggedInUser(Principal principal){
         return  principal.getName();
     }
-
 }

@@ -1,4 +1,4 @@
-package com.jwt.config;
+package com.jwt.controlleres;
 
 
 import com.jwt.bindings.UserRequest;
@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-
     @Autowired
     private UserDetailsService userDetailsService;
 
@@ -32,9 +31,7 @@ public class AuthController {
     private UserServiceImpl userService;
     @Autowired
     private JwtHelper helper;
-
     private Logger logger = LoggerFactory.getLogger(AuthController.class);
-
 
     @PostMapping("/login")
     public ResponseEntity<UserResponse> login(@RequestBody UserRequest request) {
@@ -42,19 +39,16 @@ public class AuthController {
         this.doAuthenticate(request.getEmail() ,request.getPassword());
         UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
         String token = this.helper.generateToken(userDetails);
-
         UserResponse response = new UserResponse();
         response.setEmail(userDetails.getUsername());
         response.setJwtToken(token);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
     @PostMapping("/register")
     public ResponseEntity<User> registerUser(@RequestBody User user){
         logger.error("Registering User");
         return ResponseEntity.ok(this.userService.register(user));
     }
-
     private void doAuthenticate(String email, String password) {
 
         System.out.println("Authenticating user: " + email);
@@ -66,9 +60,7 @@ public class AuthController {
         } catch (BadCredentialsException e) {
             throw new BadCredentialsException(" Invalid email or Password  !!");
         }
-
     }
-
     @ExceptionHandler(BadCredentialsException.class)
     public String exceptionHandler() {
         return "Credentials Invalid !!";
